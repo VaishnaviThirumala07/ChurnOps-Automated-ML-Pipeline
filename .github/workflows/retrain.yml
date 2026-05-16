@@ -1,0 +1,71 @@
+name: ML Training Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  repository_dispatch:
+    types: [ drift_retrain ]
+
+jobs:
+  train-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Pull DVC Data from Remote
+        env:
+          # Set DAGSHUB_USER_TOKEN in GitHub Secrets for DagsHub remote
+          DAGSHUB_USER_TOKEN: ${{ secrets.DAGSHUB_USER_TOKEN }}
+        run: |
+          dvc pull --no-run-cache || echo "DVC pull skipped (no remote configured)"
+
+      - name: Run DVC Pipeline
+        env:
+          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+        run: |
+          python src/stages/data_load.py
+          python src/stages/data_preprocess.py
+          python src/stages/train.py
+
+      - name: Promote Model to Production
+        env:
+          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+        run: python src/utils/promote_model.py
+
+      - name: Build Docker Image
+        run: |
+          docker build -t churn-api:${{ github.sha }} -f deployment/Dockerfile .
+          echo "Docker image churn-api:${{ github.sha }} built successfully"
+
+      - name: Push Docker Image to DockerHub
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          if [ -n "$DOCKER_USERNAME" ] && [ -n "$DOCKER_PASSWORD" ]; then
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            docker tag churn-api:${{ github.sha }} $DOCKER_USERNAME/churn-api:latest
+            docker push $DOCKER_USERNAME/churn-api:latest
+            echo "Docker image pushed to DockerHub"
+          else
+            echo "DOCKER credentials not set — skipping push"
+          fi
+
+      - name: Upload Reports as Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: training-reports
+          path: reports/
+          if-no-files-found: warn

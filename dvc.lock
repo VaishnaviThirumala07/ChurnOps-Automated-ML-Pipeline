@@ -1,0 +1,230 @@
+schema: '2.0'
+stages:
+  data_load:
+    cmd: C:\Users\hi\AppData\Local\Programs\Python\Python312\python.exe 
+      src/stages/data_load.py
+    deps:
+    - path: params.yaml
+      hash: md5
+      md5: c1785c69354327a04c0508465b9f89ce
+      size: 1017
+    - path: src/stages/data_load.py
+      hash: md5
+      md5: cd18a75748d6b03d2ee1c93683be0a65
+      size: 3264
+    outs:
+    - path: data/raw/churn.csv
+      hash: md5
+      md5: 3b0bfab28a8101b4e4fdd08025a5c235
+      size: 970457
+  data_validate:
+    cmd: C:\Users\hi\AppData\Local\Programs\Python\Python312\python.exe 
+      src/stages/data_validate.py
+    deps:
+    - path: data/raw/churn.csv
+      hash: md5
+      md5: 3b0bfab28a8101b4e4fdd08025a5c235
+      size: 970457
+    - path: params.yaml
+      hash: md5
+      md5: c1785c69354327a04c0508465b9f89ce
+      size: 1017
+    - path: src/stages/data_validate.py
+      hash: md5
+      md5: eda4bfde53b3e75a9502d22f754a3211
+      size: 2825
+    outs:
+    - path: reports/data_validation_status.txt
+      hash: md5
+      md5: 5cea196d1058bbb8b75fbe6278c78d23
+      size: 33
+  preprocess:
+    cmd: C:\Users\hi\AppData\Local\Programs\Python\Python312\python.exe 
+      src/stages/data_preprocess.py
+    deps:
+    - path: data/raw/churn.csv
+      hash: md5
+      md5: 3b0bfab28a8101b4e4fdd08025a5c235
+      size: 970457
+    - path: params.yaml
+      hash: md5
+      md5: c1785c69354327a04c0508465b9f89ce
+      size: 1017
+    - path: reports/data_validation_status.txt
+      hash: md5
+      md5: 5cea196d1058bbb8b75fbe6278c78d23
+      size: 33
+    - path: src/stages/data_preprocess.py
+      hash: md5
+      md5: e969d5d67ecff2b207f9ebaf83fee23e
+      size: 9459
+    params:
+      params.yaml:
+        base.random_seed: 42
+        data:
+          raw_data_path: data/raw/churn.csv
+          processed_dir: data/processed
+          train_path: data/processed/train.parquet
+          test_path: data/processed/test.parquet
+          reference_path: data/processed/reference.parquet
+          test_size: 0.2
+          target_column: Churn
+        preprocessing:
+          drop_columns:
+          - customerID
+          categorical_columns:
+          - gender
+          - Partner
+          - Dependents
+          - PhoneService
+          - MultipleLines
+          - InternetService
+          - OnlineSecurity
+          - OnlineBackup
+          - DeviceProtection
+          - TechSupport
+          - StreamingTV
+          - StreamingMovies
+          - Contract
+          - PaperlessBilling
+          - PaymentMethod
+          numerical_columns:
+          - tenure
+          - MonthlyCharges
+          - TotalCharges
+    outs:
+    - path: data/processed/reference.parquet
+      hash: md5
+      md5: fed5f40ac72b4a1efa7ac7a5703247d6
+      size: 54626
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: 89e8e388d7b680c5c430e1b372204b8e
+      size: 102377
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: cf545590d59fe4ac74b89be295489094
+      size: 274447
+    - path: models/preprocessor.pkl
+      hash: md5
+      md5: 0eabb94e54d4b0c2e73c7b004f20845d
+      size: 7154
+  train:
+    cmd: C:\Users\hi\AppData\Local\Programs\Python\Python312\python.exe 
+      src/stages/train.py
+    deps:
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: 89e8e388d7b680c5c430e1b372204b8e
+      size: 102377
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: cf545590d59fe4ac74b89be295489094
+      size: 274447
+    - path: src/stages/train.py
+      hash: md5
+      md5: fe176678e838493f92bdb7ae94fce708
+      size: 6295
+    params:
+      params.yaml:
+        base.random_seed: 42
+        train:
+          model_name: ChurnModel
+          n_estimators: 300
+          max_depth: 6
+          learning_rate: 0.05
+          subsample: 0.8
+          colsample_bytree: 0.8
+          scale_pos_weight: 2.7
+          eval_metric: auc
+          early_stopping_rounds: 30
+    outs:
+    - path: models/baseline_model.pkl
+      hash: md5
+      md5: 4dcd35933fa8914461a58ae36d6140f2
+      size: 981446
+    - path: reports/confusion_matrix.png
+      hash: md5
+      md5: 8a8e6a9913ee9a8a2195b49f306e3831
+      size: 18002
+    - path: reports/roc_curve.png
+      hash: md5
+      md5: a6cfd1b986093e8030939f23d7d59d70
+      size: 36664
+  train_advanced:
+    cmd: C:\Users\hi\AppData\Local\Programs\Python\Python312\python.exe 
+      src/stages/train_advanced.py
+    deps:
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: 89e8e388d7b680c5c430e1b372204b8e
+      size: 102377
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: cf545590d59fe4ac74b89be295489094
+      size: 274447
+    - path: src/stages/train_advanced.py
+      hash: md5
+      md5: dfcb69c9305273de18c4b268bb5b3d24
+      size: 12216
+    params:
+      params.yaml:
+        base.random_seed: 42
+        train:
+          model_name: ChurnModel
+          n_estimators: 300
+          max_depth: 6
+          learning_rate: 0.05
+          subsample: 0.8
+          colsample_bytree: 0.8
+          scale_pos_weight: 2.7
+          eval_metric: auc
+          early_stopping_rounds: 30
+    outs:
+    - path: models/model.pkl
+      hash: md5
+      md5: e1d6237851c64265282702e42e390c19
+      size: 6300772
+    - path: reports/metrics.json
+      hash: md5
+      md5: 06695685a01c44bfa84e27b4066333aa
+      size: 109
+    - path: reports/shap/shap_summary_bar.png
+      hash: md5
+      md5: d3c5bd1bac6b6985e369faee2463ad83
+      size: 81569
+    - path: reports/shap/shap_summary_beeswarm.png
+      hash: md5
+      md5: 2dd1b20cd8463f3dead94ba691ce14ef
+      size: 138842
+  business_analysis:
+    cmd: C:\Users\hi\AppData\Local\Programs\Python\Python312\python.exe 
+      src/utils/business_analysis.py
+    deps:
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: 89e8e388d7b680c5c430e1b372204b8e
+      size: 102377
+    - path: models/model.pkl
+      hash: md5
+      md5: 15f14bb3810d96b9055165ada9f2a6e8
+      size: 6560532
+    - path: src/utils/business_analysis.py
+      hash: md5
+      md5: e6804111abf0e1d22c0ac737ff6d2983
+      size: 2357
+    params:
+      params.yaml:
+        data:
+          raw_data_path: data/raw/churn.csv
+          processed_dir: data/processed
+          train_path: data/processed/train.parquet
+          test_path: data/processed/test.parquet
+          reference_path: data/processed/reference.parquet
+          test_size: 0.2
+          target_column: Churn
+    outs:
+    - path: reports/business_roi.yaml
+      hash: md5
+      md5: 03cd0adb1fbd56f14682fc924577ba71
+      size: 769

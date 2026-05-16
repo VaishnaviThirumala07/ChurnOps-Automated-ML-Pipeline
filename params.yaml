@@ -1,0 +1,52 @@
+base:
+  random_seed: 42
+  log_level: INFO
+
+data:
+  raw_data_path: data/raw/churn.csv
+  processed_dir: data/processed
+  train_path: data/processed/train.parquet
+  test_path: data/processed/test.parquet
+  reference_path: data/processed/reference.parquet
+  test_size: 0.2
+  target_column: Churn
+
+preprocessing:
+  drop_columns:
+    - customerID
+  categorical_columns:
+    - gender
+    - Partner
+    - Dependents
+    - PhoneService
+    - MultipleLines
+    - InternetService
+    - OnlineSecurity
+    - OnlineBackup
+    - DeviceProtection
+    - TechSupport
+    - StreamingTV
+    - StreamingMovies
+    - Contract
+    - PaperlessBilling
+    - PaymentMethod
+  numerical_columns:
+    - tenure
+    - MonthlyCharges
+    - TotalCharges
+
+train:
+  model_name: ChurnModel
+  n_estimators: 300
+  max_depth: 6
+  learning_rate: 0.05
+  subsample: 0.8
+  colsample_bytree: 0.8
+  scale_pos_weight: 2.7
+  eval_metric: auc
+  early_stopping_rounds: 30
+
+monitoring:
+  drift_threshold: 0.5
+  reference_window_size: 1000
+  current_window_size: 200

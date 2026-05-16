@@ -1,0 +1,95 @@
+stages:
+
+  # ── Stage 1: Data Loading ──────────────────────────────────────────────────
+  data_load:
+    cmd: C:\Users\hi\AppData\Local\Programs\Python\Python312\python.exe src/stages/data_load.py
+    deps:
+      - src/stages/data_load.py
+      - params.yaml
+    outs:
+      - data/raw/churn.csv:
+          cache: true
+
+  # ── Stage 1.5: Data Validation (Pandera schema checks) ────────────────────
+  data_validate:
+    cmd: C:\Users\hi\AppData\Local\Programs\Python\Python312\python.exe src/stages/data_validate.py
+    deps:
+      - src/stages/data_validate.py
+      - data/raw/churn.csv
+      - params.yaml
+    outs:
+      - reports/data_validation_status.txt:
+          cache: false
+
+  # ── Stage 2: Preprocessing ────────────────────────────────────────────────
+  preprocess:
+    cmd: C:\Users\hi\AppData\Local\Programs\Python\Python312\python.exe src/stages/data_preprocess.py
+    deps:
+      - src/stages/data_preprocess.py
+      - data/raw/churn.csv
+      - reports/data_validation_status.txt
+      - params.yaml
+    params:
+      - preprocessing
+      - data
+      - base.random_seed
+    outs:
+      - data/processed/train.parquet:
+          cache: true
+      - data/processed/test.parquet:
+          cache: true
+      - data/processed/reference.parquet:
+          cache: true
+      - models/preprocessor.pkl:
+          cache: true
+
+  # ── Stage 3: Training (Baseline XGBoost) ──────────────────────────────────
+  train:
+    cmd: C:\Users\hi\AppData\Local\Programs\Python\Python312\python.exe src/stages/train.py
+    deps:
+      - src/stages/train.py
+      - data/processed/train.parquet
+      - data/processed/test.parquet
+    params:
+      - train
+      - base.random_seed
+    outs:
+      - models/baseline_model.pkl:
+          cache: true
+      - reports/confusion_matrix.png:
+          cache: false
+      - reports/roc_curve.png:
+          cache: false
+
+  # ── Stage 4: Advanced Training (Optuna HPO + Champion/Challenger + SHAP) ──
+  train_advanced:
+    cmd: C:\Users\hi\AppData\Local\Programs\Python\Python312\python.exe src/stages/train_advanced.py
+    deps:
+      - src/stages/train_advanced.py
+      - data/processed/train.parquet
+      - data/processed/test.parquet
+    params:
+      - train
+      - base.random_seed
+    outs:
+      - models/model.pkl:
+          cache: true
+      - reports/metrics.json:
+          cache: false
+      - reports/shap/shap_summary_beeswarm.png:
+          cache: false
+      - reports/shap/shap_summary_bar.png:
+          cache: false
+
+  # ── Stage 5: Business ROI Analysis ────────────────────────────────────────
+  business_analysis:
+    cmd: C:\Users\hi\AppData\Local\Programs\Python\Python312\python.exe src/utils/business_analysis.py
+    deps:
+      - src/utils/business_analysis.py
+      - models/model.pkl
+      - data/processed/test.parquet
+    params:
+      - data
+    outs:
+      - reports/business_roi.yaml:
+          cache: false
