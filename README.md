@@ -64,47 +64,8 @@ graph TD
 
 ---
 
-## 📁 Project Structure
-
-```
-DS_Project1/
-├── .github/workflows/
-│   └── retrain.yml          # CI/CD: train → promote → Docker push
-├── data/
-│   ├── raw/                 # DVC-tracked: churn.csv
-│   └── processed/           # DVC-tracked: train/test/reference .parquet
-├── deployment/
-│   ├── app.py               # FastAPI REST API
-│   ├── streamlit_app.py     # Interactive Streamlit demo
-│   ├── Dockerfile           # Container for API serving
-│   └── prometheus.yml       # Prometheus scrape config
-├── models/                  # DVC-tracked: model.pkl, preprocessor.pkl
-├── reports/                 # Drift reports, confusion matrix, ROC, SHAP
-├── src/
-│   ├── stages/
-│   │   ├── data_load.py         # Stage 1: Download + validate dataset
-│   │   ├── data_validate.py     # Stage 1.5: Pandera schema enforcement
-│   │   ├── data_preprocess.py   # Stage 2: Clean, encode, feature engineer
-│   │   ├── train.py             # Stage 3: XGBoost + MLflow logging
-│   │   └── train_advanced.py    # Stage 4: Optuna + Champion/Challenger + SHAP
-│   ├── monitoring/
-│   │   ├── drift_service.py     # Evidently AI drift analysis
-│   │   └── metrics_exporter.py  # Prometheus metrics exporter
-│   └── utils/
-│       ├── business_analysis.py # ROI / cost-benefit analysis
-│       ├── drift_trigger.py     # GitHub Actions dispatcher
-│       ├── generate_drift.py    # Synthetic drift data generator
-│       └── promote_model.py     # MLflow model promotion
-├── tests/
-│   └── test_data_pipeline.py    # Pytest: 9 unit tests across 3 classes
-├── dvc.yaml                 # 5-stage reproducible pipeline
-├── params.yaml              # All hyperparameters & config
-├── docker-compose.yml       # MLflow + Prometheus + Grafana stack
-├── .env.example             # Environment variable template
-└── requirements.txt
-```
-
 ---
+
 
 ## ⚡ Quick Start
 
@@ -234,25 +195,5 @@ pytest tests/ -v
 
 ---
 
-## 📊 Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| **Data Pipeline** | DVC 3.47, Pandas, PyArrow |
-| **Validation** | Pandera 0.18 |
-| **Training** | XGBoost, LightGBM, Scikit-learn |
-| **HPO** | Optuna 3.5 |
-| **Explainability** | SHAP 0.44 |
-| **Experiment Tracking** | MLflow 2.10 |
-| **API Serving** | FastAPI, Uvicorn, Pydantic v2 |
-| **Demo UI** | Streamlit 1.32 |
-| **Monitoring** | Evidently AI 0.4, Prometheus, Grafana |
-| **Containerisation** | Docker, docker-compose |
-| **CI/CD** | GitHub Actions |
-| **Logging** | Loguru |
-
 ---
 
-## 📄 License
-
-MIT License — see [LICENSE](LICENSE) for details.
