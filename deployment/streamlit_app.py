@@ -11,6 +11,7 @@ import yaml
 import json
 try:
     import xgboost  
+    import lightgbm
     import sklearn  
 except ImportError:
     pass 
