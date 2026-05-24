@@ -20,7 +20,8 @@ import sys
 import os
 
 # Add project root to sys.path
-sys.path.append(str(Path(__file__).resolve().parent.parent))
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.append(str(PROJECT_ROOT))
 
 # ── Page Config ────────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -87,8 +88,8 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 @st.cache_resource
 def load_artifacts():
     try:
-        model        = joblib.load("models/model.pkl")
-        preprocessor = joblib.load("models/preprocessor.pkl")
+        model        = joblib.load(PROJECT_ROOT / "models/model.pkl")
+        preprocessor = joblib.load(PROJECT_ROOT / "models/preprocessor.pkl")
         return model, preprocessor, None
     except FileNotFoundError:
         return None, None, "File not found"
@@ -99,13 +100,13 @@ def load_artifacts():
 
 @st.cache_data
 def load_params():
-    with open("params.yaml") as f:
+    with open(PROJECT_ROOT / "params.yaml") as f:
         return yaml.safe_load(f)
 
 @st.cache_data
 def load_metrics():
     try:
-        with open("reports/metrics.json") as f:
+        with open(PROJECT_ROOT / "reports/metrics.json") as f:
             return json.load(f)
     except:
         return {"auc": 0.0, "accuracy": 0.0, "f1_score": 0.0}

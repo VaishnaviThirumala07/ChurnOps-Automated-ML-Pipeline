@@ -17,7 +17,9 @@ env/
 # DVC (track .dvc files, not data)
 /data/raw/
 /data/processed/
-/models/
+/models/*
+!/models/model.pkl
+!/models/preprocessor.pkl
 !*.dvc
 
 # MLflow
