@@ -99,12 +99,11 @@ def load_artifacts():
     except Exception as e:
         return None, None, str(e)
 
-@st.cache_data
+@st.cache_data(ttl=300)
 def load_params():
     with open(PROJECT_ROOT / "params.yaml") as f:
         return yaml.safe_load(f)
 
-@st.cache_data
 def load_metrics():
     try:
         with open(PROJECT_ROOT / "reports/metrics.json") as f:
