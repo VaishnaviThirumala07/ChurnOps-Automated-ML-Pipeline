@@ -207,8 +207,8 @@ stages:
       size: 102377
     - path: models/model.pkl
       hash: md5
-      md5: 15f14bb3810d96b9055165ada9f2a6e8
-      size: 6560532
+      md5: e1d6237851c64265282702e42e390c19
+      size: 6300772
     - path: src/utils/business_analysis.py
       hash: md5
       md5: e6804111abf0e1d22c0ac737ff6d2983
@@ -226,5 +226,5 @@ stages:
     outs:
     - path: reports/business_roi.yaml
       hash: md5
-      md5: 03cd0adb1fbd56f14682fc924577ba71
+      md5: fb722504f68d8aeed50cdfb1cec768de
       size: 769

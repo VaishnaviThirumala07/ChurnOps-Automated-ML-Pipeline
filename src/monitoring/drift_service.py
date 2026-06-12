@@ -71,6 +71,10 @@ if __name__ == "__main__":
     # Load raw data and apply drift for testing
     raw_df = pd.read_csv(params["data"]["raw_data_path"])
     
+    from src.stages.data_preprocess import fix_raw_data, engineer_features
+    raw_df = fix_raw_data(raw_df)
+    raw_df = engineer_features(raw_df)
+    
     # Mocking 'current' data by taking a sample and adding drift
     from src.utils.generate_drift import generate_drifted_data
     drifted_sample = generate_drifted_data(raw_df.sample(500), drift_intensity=0.6)

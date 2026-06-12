@@ -9,7 +9,10 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 from loguru import logger
+import sys
 
+# Add project root to sys.path
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 
 def load_params(params_path: str = "params.yaml") -> dict:
     with open(params_path, "r") as f:
@@ -55,6 +58,10 @@ def main():
 
     logger.info(f"Loading raw data from: {raw_path}")
     df = pd.read_csv(raw_path)
+    
+    from src.stages.data_preprocess import fix_raw_data, engineer_features
+    df = fix_raw_data(df)
+    df = engineer_features(df)
 
     drifted_df = generate_drifted_data(df, drift_intensity=0.4)
     drifted_df.to_csv(drifted_path, index=False)
