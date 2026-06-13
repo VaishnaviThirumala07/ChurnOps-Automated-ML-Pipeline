@@ -2,7 +2,7 @@ stages:
 
   # ── Stage 1: Data Loading ──────────────────────────────────────────────────
   data_load:
-    cmd: C:\Users\hi\AppData\Local\Programs\Python\Python312\python.exe src/stages/data_load.py
+    cmd: python src/stages/data_load.py
     deps:
       - src/stages/data_load.py
       - params.yaml
@@ -12,7 +12,7 @@ stages:
 
   # ── Stage 1.5: Data Validation (Pandera schema checks) ────────────────────
   data_validate:
-    cmd: C:\Users\hi\AppData\Local\Programs\Python\Python312\python.exe src/stages/data_validate.py
+    cmd: python src/stages/data_validate.py
     deps:
       - src/stages/data_validate.py
       - data/raw/churn.csv
@@ -23,7 +23,7 @@ stages:
 
   # ── Stage 2: Preprocessing ────────────────────────────────────────────────
   preprocess:
-    cmd: C:\Users\hi\AppData\Local\Programs\Python\Python312\python.exe src/stages/data_preprocess.py
+    cmd: python src/stages/data_preprocess.py
     deps:
       - src/stages/data_preprocess.py
       - data/raw/churn.csv
@@ -45,7 +45,7 @@ stages:
 
   # ── Stage 3: Training (Baseline XGBoost) ──────────────────────────────────
   train:
-    cmd: C:\Users\hi\AppData\Local\Programs\Python\Python312\python.exe src/stages/train.py
+    cmd: python src/stages/train.py
     deps:
       - src/stages/train.py
       - data/processed/train.parquet
@@ -63,7 +63,7 @@ stages:
 
   # ── Stage 4: Advanced Training (Optuna HPO + Champion/Challenger + SHAP) ──
   train_advanced:
-    cmd: C:\Users\hi\AppData\Local\Programs\Python\Python312\python.exe src/stages/train_advanced.py
+    cmd: python src/stages/train_advanced.py
     deps:
       - src/stages/train_advanced.py
       - data/processed/train.parquet
@@ -83,7 +83,7 @@ stages:
 
   # ── Stage 5: Business ROI Analysis ────────────────────────────────────────
   business_analysis:
-    cmd: C:\Users\hi\AppData\Local\Programs\Python\Python312\python.exe src/utils/business_analysis.py
+    cmd: python src/utils/business_analysis.py
     deps:
       - src/utils/business_analysis.py
       - models/model.pkl

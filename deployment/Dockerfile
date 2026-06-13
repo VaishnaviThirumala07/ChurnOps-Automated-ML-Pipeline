@@ -16,6 +16,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src/ ./src/
 COPY deployment/ ./deployment/
 COPY models/ ./models/
+COPY reports/ ./reports/
 COPY params.yaml .
 
 # Expose port
