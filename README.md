@@ -1,4 +1,4 @@
-# 📡 Churn Prediction MLOps Pipeline
+# 📡 ChurnOps: Automated MLOps Pipeline for Churn Prediction
 
 [![ML Pipeline](https://github.com/your-username/DS_Project1/actions/workflows/retrain.yml/badge.svg)](https://github.com/your-username/DS_Project1/actions)
 [![Python](https://img.shields.io/badge/Python-3.9-blue?logo=python)](https://python.org)
@@ -8,30 +8,49 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.109-green?logo=fastapi)](https://fastapi.tiangolo.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> **Production-grade MLOps system** for telecom customer churn prediction. Covers the full ML lifecycle: reproducible data pipelines, experiment tracking, REST API serving, automated drift monitoring, and CI/CD-triggered retraining — all wired end-to-end.
+> **Production-grade MLOps system** for telecom customer churn prediction on the IBM Telco dataset (7,043 rows). Features leak-free evaluation, Stacking Ensembles, Optuna HPO, SHAP explainability, threshold optimization, REST API serving, Evidently AI drift monitoring, and GitHub Actions automated retraining.
 
 ---
 
-## 📊 Results & Performance
+## 📊 Results & Leak-Free Evaluation Protocol
 
-| Metric | Baseline (XGBoost) | **Ultimate Stacking Ensemble** |
+> [!NOTE]
+> **Evaluation Integrity**: Stratified 80/20 train/test split is applied prior to any feature transformation or scaling. Test set remains un-oversampled and untouched during training to prevent data leakage. Given the ~26.5% class imbalance, model performance is evaluated using **PR-AUC (Precision-Recall AUC)** alongside **ROC-AUC** and **Recall@t***.
+
+| Metric | Baseline XGBoost | Stacking Ensemble (Default t=0.50) | **Stacking Ensemble (Optimal t*=0.20)** |
+| :--- | :--- | :--- | :--- |
+| **ROC-AUC** | 0.848 | 0.846 | **0.846** |
+| **PR-AUC (Imbalanced)** | 0.658 | 0.660 | **0.660** |
+| **Recall (Churners Caught)** | 52.4% | 46.8% | **81.3%** |
+| **Precision** | 63.8% | 68.2% | **51.5%** |
+| **F1-Score** | 0.575 | 0.555 | **0.631** |
+
+---
+
+## 💰 Business ROI & Threshold Optimization
+
+Rather than using an arbitrary `0.50` decision threshold, this system employs a **cost-sensitive threshold optimizer** $t^*$ that maximizes expected monetary profit on customer retention campaigns:
+
+$$\text{Net Profit}(t) = \text{TP}(t) \times (S \times V - C) - \text{FP}(t) \times C$$
+
+### Explicit ROI Assumptions:
+* **Customer Lifetime Value ($V$)**: $500
+* **Intervention Campaign Cost ($C$)**: $50
+* **Retention Campaign Save Rate ($S$)**: 40% (40% of contacted churners are successfully retained)
+
+### Financial Impact (per 1,000 Customers)
+> *Under assumed LTV ($500), intervention cost ($50), and save rate (40%)*
+
+| Metric | Default Threshold (t=0.50) | **Optimal Threshold (t*=0.20)** |
 | :--- | :--- | :--- |
-| **Accuracy** | 81.2% | **90.4%** |
-| **ROC-AUC** | 0.84 | **0.91** |
-| **F1-Score** | 0.58 | **0.65** |
-
-### 💰 Business Impact (Simulation)
-Based on a test cohort of 1,000 customers:
-| Metric | Result |
-| :--- | :--- |
-| Estimated Revenue Saved | ~$48,000 |
-| Intervention Costs | ~$7,200 |
-| **Net Profit** | **~$40,800** |
-| Churners Missed (FN cost) | ~$19,000 |
-
-*Assumptions: $500 avg customer value · $50 intervention cost · 40% retention success rate*
+| **Targeted Customers** | 182 | **420** |
+| **Churners Retained (TP × 40%)** | ~49 customers ($24,500 value) | **~86 customers ($43,000 value)** |
+| **Campaign Cost** | $9,100 | **$21,000** |
+| **Net Profit** | **~$15,400** | **~$22,214 (+44% gain)** |
+| **Net Campaign ROI** | 169.2% | **105.8%** |
 
 ---
+
 
 ## 🏗️ Architecture
 
