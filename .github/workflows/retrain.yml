@@ -35,9 +35,7 @@ jobs:
         env:
           MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
         run: |
-          python src/stages/data_load.py
-          python src/stages/data_preprocess.py
-          python src/stages/train.py
+          dvc repro
 
       - name: Promote Model to Production
         env:
