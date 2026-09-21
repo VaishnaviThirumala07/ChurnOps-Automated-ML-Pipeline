@@ -50,3 +50,10 @@ monitoring:
   drift_threshold: 0.5
   reference_window_size: 1000
   current_window_size: 200
+
+business:
+  ltv: 500
+  intervention_cost: 50
+  save_rate: 0.40
+  threshold_step: 0.01
+

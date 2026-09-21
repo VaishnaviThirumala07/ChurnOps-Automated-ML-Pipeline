@@ -1,42 +1,30 @@
-churners_missed_cost: !!python/object/apply:numpy._core.multiarray.scalar
-- &id001 !!python/object/apply:numpy.dtype
-  args:
-  - i8
-  - false
-  - true
-  state: !!python/tuple
-  - 3
-  - <
-  - null
-  - null
-  - null
-  - -1
-  - -1
-  - 0
-- !!binary |
-  nF0BAAAAAAA=
-intervention_costs: !!python/object/apply:numpy._core.multiarray.scalar
-- *id001
-- !!binary |
-  DjgAAAAAAAA=
-net_profit: !!python/object/apply:numpy._core.multiarray.scalar
-- &id002 !!python/object/apply:numpy.dtype
-  args:
-  - f8
-  - false
-  - true
-  state: !!python/tuple
-  - 3
-  - <
-  - null
-  - null
-  - null
-  - -1
-  - -1
-  - 0
-- !!binary |
-  AAAAAIAS2EA=
-revenue_saved: !!python/object/apply:numpy._core.multiarray.scalar
-- *id002
-- !!binary |
-  AAAAAAAL40A=
+assumptions:
+  disclaimer: Under assumed LTV ($500), intervention cost ($50), and save rate (40%)
+  intervention_cost: 50
+  ltv: 500
+  save_rate: 0.4
+default_threshold:
+  false_negatives: 181
+  false_positives: 90
+  intervention_costs: 14150.0
+  missed_churn_cost: 90500.0
+  net_profit: 24450.0
+  revenue_saved: 38600.0
+  roi_percent: 172.8
+  threshold: 0.5
+  true_negatives: 945
+  true_positives: 193
+extrapolated_per_1000_customers:
+  net_profit: 22214.34
+  roi_percent: 106.1
+optimal_threshold:
+  false_negatives: 70
+  false_positives: 286
+  intervention_costs: 29500.0
+  missed_churn_cost: 35000.0
+  net_profit: 31300.0
+  revenue_saved: 60800.0
+  roi_percent: 106.1
+  threshold: 0.2
+  true_negatives: 749
+  true_positives: 304

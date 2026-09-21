@@ -9,7 +9,10 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 from loguru import logger
+import sys
 
+# Add project root to sys.path
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 
 def load_params(params_path: str = "params.yaml") -> dict:
     with open(params_path, "r") as f:
@@ -25,14 +28,15 @@ def generate_drifted_data(df: pd.DataFrame, drift_intensity: float = 0.3) -> pd.
     logger.info(f"Applying drift with intensity: {drift_intensity}")
 
     # 1. Shift MonthlyCharges upward (simulate price hike)
-    drifted["MonthlyCharges"] = drifted["MonthlyCharges"] * (1 + drift_intensity * 0.5)
+    drifted["MonthlyCharges"] = pd.to_numeric(drifted["MonthlyCharges"], errors="coerce") * (1 + drift_intensity * 0.5)
 
     # 2. Reduce tenure (simulate newer customer base)
-    drifted["tenure"] = drifted["tenure"] * (1 - drift_intensity * 0.4)
+    drifted["tenure"] = pd.to_numeric(drifted["tenure"], errors="coerce") * (1 - drift_intensity * 0.4)
     drifted["tenure"] = drifted["tenure"].clip(lower=0)
 
     # 3. Shift TotalCharges accordingly
-    drifted["TotalCharges"] = drifted["TotalCharges"] * (1 + drift_intensity * 0.3)
+    drifted["TotalCharges"] = pd.to_numeric(drifted["TotalCharges"], errors="coerce").fillna(drifted["MonthlyCharges"]) * (1 + drift_intensity * 0.3)
+
 
     # 4. Flip Contract type to shorter (month-to-month) for ~30% of rows
     if "Contract" in drifted.columns:
@@ -55,6 +59,10 @@ def main():
 
     logger.info(f"Loading raw data from: {raw_path}")
     df = pd.read_csv(raw_path)
+    
+    from src.stages.data_preprocess import fix_raw_data, engineer_features
+    df = fix_raw_data(df)
+    df = engineer_features(df)
 
     drifted_df = generate_drifted_data(df, drift_intensity=0.4)
     drifted_df.to_csv(drifted_path, index=False)

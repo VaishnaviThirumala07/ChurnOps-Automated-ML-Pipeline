@@ -1,5 +1,21 @@
 {
-    "accuracy": 0.8041163946061036,
-    "auc": 0.8449611201529361,
-    "f1_score": 0.5830815709969789
+    "auc": 0.8455,
+    "pr_auc": 0.6602,
+    "optimal_threshold": 0.2,
+    "max_net_profit": 31300.0,
+    "net_profit_per_1000": 22214.34,
+    "accuracy_at_opt": 0.7473,
+    "precision_at_opt": 0.5153,
+    "recall_at_opt": 0.8128,
+    "f1_score_at_opt": 0.6307,
+    "accuracy_default": 0.8077,
+    "precision_default": 0.682,
+    "recall_default": 0.516,
+    "f1_score_default": 0.5875,
+    "assumptions": {
+        "ltv": 500,
+        "intervention_cost": 50,
+        "save_rate": 0.4,
+        "disclaimer": "Under assumed LTV ($500), intervention cost ($50), and save rate (40%)"
+    }
 }
