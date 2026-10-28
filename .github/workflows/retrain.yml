@@ -5,41 +5,47 @@ on:
     branches: [ main ]
   repository_dispatch:
     types: [ drift_retrain ]
+  workflow_dispatch:
+
+env:
+  # Fall back to a local SQLite store when no remote MLflow server is configured
+  MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI || 'sqlite:///ci_mlflow.db' }}
 
 jobs:
   train-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version-file: '.python-version'
+          cache: 'pip'
 
       - name: Install Dependencies
         run: |
           pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements.txt pytest
+
+      - name: Run Tests
+        run: python -m pytest tests -q
 
       - name: Pull DVC Data from Remote
         env:
           # Set DAGSHUB_USER_TOKEN in GitHub Secrets for DagsHub remote
           DAGSHUB_USER_TOKEN: ${{ secrets.DAGSHUB_USER_TOKEN }}
         run: |
-          dvc pull --no-run-cache || echo "DVC pull skipped (no remote configured)"
+          dvc pull || echo "DVC pull skipped (no remote configured)"
 
       - name: Run DVC Pipeline
-        env:
-          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
         run: |
+          mkdir -p logs
           dvc repro
 
       - name: Promote Model to Production
-        env:
-          MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
         run: python src/utils/promote_model.py
 
       - name: Build Docker Image
@@ -62,7 +68,8 @@ jobs:
           fi
 
       - name: Upload Reports as Artifacts
-        uses: actions/upload-artifact@v3
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: training-reports
           path: reports/

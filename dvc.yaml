@@ -41,7 +41,7 @@ stages:
       - data/processed/reference.parquet:
           cache: true
       - models/preprocessor.pkl:
-          cache: true
+          cache: false  # committed to git for the Streamlit app
 
   # ── Stage 3: Training (Baseline XGBoost) ──────────────────────────────────
   train:
@@ -73,7 +73,7 @@ stages:
       - base.random_seed
     outs:
       - models/model.pkl:
-          cache: true
+          cache: false  # committed to git for the Streamlit app
       - reports/metrics.json:
           cache: false
       - reports/shap/shap_summary_beeswarm.png:
